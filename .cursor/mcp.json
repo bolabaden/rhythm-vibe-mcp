@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "rhythm-vibe-mcp": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["--from", ".", "mcp-rhythm-vibe"]
+    }
+  }
+}
