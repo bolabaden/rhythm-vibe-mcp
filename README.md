@@ -1,4 +1,4 @@
-# lilycode-mcp
+# rhythm-vibe-mcp
 
 MCP server for "vibe coding" music with LilyPond-first workflows and resilient fallbacks.
 
@@ -10,6 +10,8 @@ MCP server for "vibe coding" music with LilyPond-first workflows and resilient f
 |-----|-------------|
 | [VISION_AND_SPECIFICATION.md](docs/VISION_AND_SPECIFICATION.md) | Goals, feature scope, error-handling philosophy, MCP best practices |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Server design, format strategy, failure-tolerant continuation |
+| [WEBUI_RESEARCH_AND_DECISIONS.md](docs/WEBUI_RESEARCH_AND_DECISIONS.md) | Single-page web UI redesign research, decisions, tradeoffs, and validation notes |
+| [IMPLEMENTED_STATUS_AGAINST_PROMPTS.md](docs/IMPLEMENTED_STATUS_AGAINST_PROMPTS.md) | Implementation-only mapping from planning prompts to what currently exists in code/tests |
 | [TEST_EVALUATION.md](docs/TEST_EVALUATION.md) | Testing approach and evaluation criteria |
 
 ## What this server supports now
@@ -58,7 +60,7 @@ Unit tests follow MCP server best practices: in-process, no subprocess or networ
 ```bash
 uv sync --extra dev
 uv run pytest tests -v
-uv run pytest tests --cov=src/lilycode_mcp --cov-report=term-missing
+uv run pytest tests --cov=src/rhythm_vibe_mcp --cov-report=term-missing
 ```
 
 - **conftest.py**: Fixtures for temp workdir, sample LilyPond/ABC/ChordPro/MIDI/MusicXML files, and env isolation.
@@ -81,14 +83,45 @@ Run from the project directory so the installed package uses source (`src/`). Ru
 ```bash
 cd C:\GitHub\rhythm-vibe-mcp
 uv sync
-uv run lilycode-mcp
+uv run rhythm-vibe-mcp
 # or: uvx --from . mcp-rhythm-vibe
 ```
+
+Select transport explicitly when needed:
+
+```bash
+uv run rhythm-vibe-mcp --transport stdio
+uv run rhythm-vibe-mcp --transport streamable-http --host 127.0.0.1 --port 8000
+uv run rhythm-vibe-mcp --transport sse --host 127.0.0.1 --port 8000
+```
+
+Supported transports: `stdio`, `streamable-http`, `sse` (`http` is accepted as an alias for `streamable-http`).
 
 Optional extras (audio/transcription, scraping):
 
 ```bash
 uv sync --extra audio --extra scrape
+```
+
+Gradio web UI (guided step-by-step UX):
+
+```bash
+uv sync
+uv run rhythm-vibe-mcp-webui --host 127.0.0.1 --port 7860
+```
+
+The Web UI runs directly from package modules and does not require launching MCP transport first.
+
+Refresh top Hugging Face music Spaces into `vendor/huggingface_spaces` and regenerate report:
+
+```bash
+uv run rhythm-vibe-refresh-spaces --query music --top-n 5 --limit 100
+```
+
+Optional cleanup of stale cloned Space folders:
+
+```bash
+uv run rhythm-vibe-refresh-spaces --query music --top-n 5 --prune
 ```
 
 **With pip:**
@@ -98,7 +131,14 @@ python -m venv .venv
 . .venv/Scripts/Activate.ps1
 pip install -e .
 pip install -e ".[audio,scrape]"   # optional
-lilycode-mcp
+rhythm-vibe-mcp
+```
+
+To launch the guided Gradio UI with pip-managed environments:
+
+```bash
+pip install -e .
+rhythm-vibe-mcp-webui
 ```
 
 ## External binaries/tools (recommended)
@@ -150,27 +190,38 @@ Alternative (Python from venv):
 ```json
 {
   "mcpServers": {
-    "lilycode-mcp": {
+    "rhythm-vibe-mcp": {
       "command": "python",
-      "args": ["-m", "lilycode_mcp.server"],
+      "args": ["-m", "rhythm_vibe_mcp.server"],
       "cwd": "c:/GitHub/rhythm-vibe-mcp"
     }
   }
 }
 ```
 
-## CLI (dynamic, tool-driven)
+## CLI (MCP client over local STDIO)
 
-A canonical CLI is generated **exclusively** from the server’s registered tools. When tools are added, removed, or renamed, the CLI updates automatically—no separate CLI code to maintain.
+`rhythm-vibe-mcp-cli` is a client CLI that launches a local MCP server process over STDIO and calls tools through the MCP protocol.
 
 ```bash
-uv run lilycode-mcp-cli --help
-uv run lilycode-mcp-cli healthcheck
-uv run lilycode-mcp-cli convert-music --input-ref path/to/file.abc --output-format musicxml
-uv run lilycode-mcp-cli plan-music-conversion --input-format abc --output-format pdf
+uv run rhythm-vibe-mcp-cli --help
+uv run rhythm-vibe-mcp-cli list-tools
+uv run rhythm-vibe-mcp-cli call healthcheck --raw
+uv run rhythm-vibe-mcp-cli call plan_music_conversion --arg input_format=abc --arg output_format=pdf
+uv run rhythm-vibe-mcp-cli call convert_music --json-args '{"input_ref":"artifacts/sample.musicxml","output_format":"midi"}'
 ```
 
-Each subcommand is one tool; use `TOOL --help` for tool-specific options. All arguments are derived from the tool’s JSON schema. For text tools (`normalize-reddit-music-text`, `convert-text-notation-to-lily-or-fallback`), pass multi-line notation with literal `\n` (e.g. `--text "X:1\nK:C\nC D E"`); the server normalizes these to newlines.
+By default the CLI launches:
+
+```bash
+python -m rhythm_vibe_mcp.server --transport stdio
+```
+
+Override server launch details with:
+
+- `--server-command`
+- repeated `--server-arg`
+- `--server-cwd`
 
 ## Current tool surface
 

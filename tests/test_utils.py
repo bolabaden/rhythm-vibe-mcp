@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from lilycode_mcp.utils import (
+from rhythm_vibe_mcp.utils import (
     artifacts_dir,
     binary_available,
     ensure_dir,
@@ -37,13 +37,13 @@ class TestEnsureDir:
 
 class TestWorkspaceRoot:
     def test_default_is_cwd(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        monkeypatch.delenv("LILYCODE_MCP_WORKDIR", raising=False)
+        monkeypatch.delenv("rhythm_vibe_mcp_WORKDIR", raising=False)
         root = workspace_root()
         assert root.is_absolute()
         assert root.exists()
 
     def test_respects_env(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-        monkeypatch.setenv("LILYCODE_MCP_WORKDIR", str(tmp_path))
+        monkeypatch.setenv("rhythm_vibe_mcp_WORKDIR", str(tmp_path))
         root = workspace_root()
         assert root == tmp_path.resolve()
 
@@ -68,6 +68,10 @@ class TestGuessFormat:
             (".wav", "wav"),
             (".mp3", "mp3"),
             (".m4a", "m4a"),
+            (".aiff", "wav"),
+            (".flac", "wav"),
+            (".caf", "wav"),
+            (".adts", "m4a"),
             (".abc", "abc"),
             (".cho", "chordpro"),
             (".chopro", "chordpro"),
@@ -96,7 +100,7 @@ class TestBinaryAvailable:
         out = binary_available("python")
         assert isinstance(out, bool)
 
-    @patch("lilycode_mcp.utils.shutil.which")
+    @patch("rhythm_vibe_mcp.utils.shutil.which")
     def test_uses_which(self, mock_which: object) -> None:
         mock_which.return_value = "/usr/bin/foo"
         assert binary_available("foo") is True

@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import pytest
 
-from lilycode_mcp.converters import (
+from rhythm_vibe_mcp.converters import (
     compile_lilypond_to_pdf,
     convert_any,
     convert_audio_container,
@@ -21,8 +21,8 @@ from lilycode_mcp.converters import (
     plan_conversion_route,
     transpose_with_music21,
 )
-from lilycode_mcp.fallbacks import fallback_from_error
-from lilycode_mcp.models import ToolResult
+from rhythm_vibe_mcp.fallbacks import fallback_from_error
+from rhythm_vibe_mcp.models import ToolResult
 
 
 class TestPlanConversionRoute:
@@ -72,7 +72,7 @@ class TestCompileLilypondToPdf:
         sample_lilypond: Path,
         monkeypatch_workdir: Path,
     ) -> None:
-        with patch("lilycode_mcp.converters.binary_available", return_value=False):
+        with patch("rhythm_vibe_mcp.converters.binary_available", return_value=False):
             result = compile_lilypond_to_pdf(sample_lilypond)
         assert result.ok is False
         assert "lilypond" in result.message.lower()
@@ -89,9 +89,9 @@ class TestCompileLilypondToPdf:
         monkeypatch_workdir: Path,
     ) -> None:
         with (
-            patch("lilycode_mcp.converters.binary_available", return_value=True),
+            patch("rhythm_vibe_mcp.converters.binary_available", return_value=True),
             patch(
-                "lilycode_mcp.converters.run_cmd", return_value=(1, "", "syntax error")
+                "rhythm_vibe_mcp.converters.run_cmd", return_value=(1, "", "syntax error")
             ),
         ):
             result = compile_lilypond_to_pdf(sample_lilypond)
@@ -112,7 +112,7 @@ class TestConvertAudioContainer:
     ) -> None:
         wav = tmp_path / "x.wav"
         wav.write_bytes(b"\x00" * 100)
-        with patch("lilycode_mcp.converters.binary_available", return_value=False):
+        with patch("rhythm_vibe_mcp.converters.binary_available", return_value=False):
             result = convert_audio_container(wav, "mp3")
         assert result.ok is False
         assert "ffmpeg" in result.message.lower()
@@ -123,9 +123,9 @@ class TestConvertAudioContainer:
         wav = tmp_path / "x.wav"
         wav.write_bytes(b"\x00" * 100)
         with (
-            patch("lilycode_mcp.converters.binary_available", return_value=True),
+            patch("rhythm_vibe_mcp.converters.binary_available", return_value=True),
             patch(
-                "lilycode_mcp.converters.run_cmd", return_value=(1, "", "Invalid data")
+                "rhythm_vibe_mcp.converters.run_cmd", return_value=(1, "", "Invalid data")
             ),
         ):
             result = convert_audio_container(wav, "mp3")
@@ -279,7 +279,7 @@ class TestConvertAny:
             ),
         )
         with patch(
-            "lilycode_mcp.converters.convert_with_music21", return_value=failed_result
+            "rhythm_vibe_mcp.converters.convert_with_music21", return_value=failed_result
         ):
             result = convert_any(sample_midi_minimal, "pdf")
         assert result.ok is False

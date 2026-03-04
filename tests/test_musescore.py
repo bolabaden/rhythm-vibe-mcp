@@ -3,12 +3,14 @@ Unit tests for MuseScore API module: auth headers and request wrapper.
 """
 from __future__ import annotations
 
-import os
 from unittest.mock import patch
 
 import pytest
 
-from lilycode_mcp.musescore import musescore_env_auth_headers, musescore_api_request
+from rhythm_vibe_mcp.integrations.musescore import (
+    musescore_api_request,
+    musescore_env_auth_headers,
+)
 
 
 class TestMusescoreEnvAuthHeaders:
@@ -30,7 +32,7 @@ class TestMusescoreEnvAuthHeaders:
 
 class TestMusescoreApiRequest:
     def test_get_request_calls_httpx(self) -> None:
-        with patch("lilycode_mcp.musescore.httpx.Client") as mock_client_cls:
+        with patch("rhythm_vibe_mcp.integrations.musescore.httpx.Client") as mock_client_cls:
             mock_resp = mock_client_cls.return_value.__enter__.return_value.get.return_value
             mock_resp.status_code = 200
             mock_resp.headers = {"content-type": "application/json"}
@@ -44,7 +46,7 @@ class TestMusescoreApiRequest:
 
     def test_auth_token_overrides_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("MUSESCORE_API_TOKEN", "env_token")
-        with patch("lilycode_mcp.musescore.httpx.Client") as mock_client_cls:
+        with patch("rhythm_vibe_mcp.integrations.musescore.httpx.Client") as mock_client_cls:
             mock_resp = mock_client_cls.return_value.__enter__.return_value.get.return_value
             mock_resp.status_code = 200
             mock_resp.headers = {"content-type": "application/json"}
@@ -57,7 +59,7 @@ class TestMusescoreApiRequest:
 
     def test_base_url_from_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("MUSESCORE_API_BASE", "https://custom.api/v1")
-        with patch("lilycode_mcp.musescore.httpx.Client") as mock_client_cls:
+        with patch("rhythm_vibe_mcp.integrations.musescore.httpx.Client") as mock_client_cls:
             mock_resp = mock_client_cls.return_value.__enter__.return_value.get.return_value
             mock_resp.status_code = 200
             mock_resp.headers = {"content-type": "application/json"}

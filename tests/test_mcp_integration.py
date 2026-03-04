@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from lilycode_mcp.server import mcp
+from rhythm_vibe_mcp.server import mcp
 
 
 def _text_from_call_tool_result(result: tuple) -> str:

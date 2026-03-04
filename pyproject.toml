@@ -3,21 +3,41 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "lilycode-mcp"
+name = "rhythm-vibe-mcp"
 version = "0.1.0"
 description = "MCP server for music vibe coding with LilyPond and robust fallbacks."
 readme = "README.md"
 requires-python = ">=3.10"
+keywords = ["mcp", "music", "lilypond", "musicxml", "midi", "gradio"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Sound/Audio",
+  "Topic :: Software Development :: Libraries",
+]
 dependencies = [
   "mcp[cli]>=1.12.0",
   "pydantic>=2.8.0",
   "httpx>=0.27.0",
   "python-dotenv>=1.0.1",
   "music21>=9.1.0",
+  "gradio>=5.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/bolabaden/rhythm-vibe-mcp"
+Repository = "https://github.com/bolabaden/rhythm-vibe-mcp"
+Issues = "https://github.com/bolabaden/rhythm-vibe-mcp/issues"
 
 [project.optional-dependencies]
 audio = [
+  "setuptools<81",
   "basic-pitch>=0.4.0",
 ]
 scrape = [
@@ -30,15 +50,21 @@ dev = [
 ]
 
 [project.scripts]
-lilycode-mcp = "lilycode_mcp.server:main"
-mcp-rhythm-vibe = "lilycode_mcp.server:main"
-lilycode-mcp-cli = "lilycode_mcp.cli:main"
+rhythm-vibe-mcp = "rhythm_vibe_mcp.server:main"
+mcp-rhythm-vibe = "rhythm_vibe_mcp.server:main"
+rhythm-vibe-mcp-cli = "rhythm_vibe_mcp.cli:main"
+rhythmvibe-cli = "rhythm_vibe_mcp.cli:main"
+rhythm-vibe-mcp-webui = "rhythm_vibe_mcp.webui:main"
+rhythm-vibe-refresh-spaces = "rhythm_vibe_mcp.spaces_sync:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+rhythm_vibe_mcp = ["py.typed"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -53,3 +79,19 @@ filterwarnings = [
   "ignore::DeprecationWarning",
   "ignore:.*is not well-formed.*:music21.musicxml.m21ToXml.MusicXMLWarning",
 ]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.coverage.run]
+source = ["src/rhythm_vibe_mcp"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false

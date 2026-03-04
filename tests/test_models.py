@@ -1,13 +1,10 @@
-"""
-Unit tests for Pydantic models: validation, serialization, and schema stability.
-"""
+"""Unit tests for Pydantic models: validation, serialization, and schema stability."""
+
 from __future__ import annotations
 
 import json
 
-import pytest
-
-from lilycode_mcp.models import (
+from rhythm_vibe_mcp.models import (
     FallbackNoteEvent,
     MusicArtifact,
     RobustMusicFallback,
@@ -134,3 +131,12 @@ class TestToolResult:
         assert d["ok"] is True
         assert len(d["artifacts"]) == 1
         assert d["artifacts"][0]["format"] == "lilypond"
+
+class TestProjectManifest:
+    def test_project_manifest_defaults(self) -> None:
+        from rhythm_vibe_mcp.models import ProjectManifest, ProjectProvenance
+        prov = ProjectProvenance(created_at="2026-03-01T12:00:00Z")
+        manifest = ProjectManifest(id="proj_123", provenance=prov)
+        assert manifest.version == "1.0.0"
+        assert manifest.title == "untitled"
+        assert len(manifest.tracks) == 0

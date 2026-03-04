@@ -1,22 +1,17 @@
-"""
-Unit tests for web fetch: download_music_asset with mocked HTTP.
-"""
+"""Unit tests for web fetch: download_music_asset with mocked HTTP."""
+
 from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-from lilycode_mcp.web_fetch import download_music_asset
+from rhythm_vibe_mcp.integrations.web import download_music_asset
 
 
 class TestDownloadMusicAsset:
-    def test_downloads_to_artifacts_dir(
-        self, monkeypatch_workdir: Path
-    ) -> None:
+    def test_downloads_to_artifacts_dir(self, monkeypatch_workdir: Path) -> None:
         fake_content = b"fake midi or binary content"
-        with patch("lilycode_mcp.web_fetch.httpx.Client") as mock_client_cls:
+        with patch("rhythm_vibe_mcp.integrations.web.httpx.Client") as mock_client_cls:
             mock_resp = MagicMock()
             mock_resp.status_code = 200
             mock_resp.content = fake_content
@@ -28,10 +23,8 @@ class TestDownloadMusicAsset:
             assert out.exists()
             assert out.read_bytes() == fake_content
 
-    def test_url_without_filename_uses_default(
-        self, monkeypatch_workdir: Path
-    ) -> None:
-        with patch("lilycode_mcp.web_fetch.httpx.Client") as mock_client_cls:
+    def test_url_without_filename_uses_default(self, monkeypatch_workdir: Path) -> None:
+        with patch("rhythm_vibe_mcp.integrations.web.httpx.Client") as mock_client_cls:
             mock_resp = MagicMock()
             mock_resp.status_code = 200
             mock_resp.content = b"data"
@@ -42,12 +35,10 @@ class TestDownloadMusicAsset:
             assert out.exists()
             assert "downloaded_music_asset" in out.name or out.suffix == ".bin"
 
-    def test_uses_provided_out_dir(
-        self, tmp_path: Path
-    ) -> None:
+    def test_uses_provided_out_dir(self, tmp_path: Path) -> None:
         custom_dir = tmp_path / "custom_downloads"
         custom_dir.mkdir()
-        with patch("lilycode_mcp.web_fetch.httpx.Client") as mock_client_cls:
+        with patch("rhythm_vibe_mcp.integrations.web.httpx.Client") as mock_client_cls:
             mock_resp = MagicMock()
             mock_resp.status_code = 200
             mock_resp.content = b"x"

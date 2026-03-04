@@ -1,0 +1,12 @@
+"""JSON keys for API-style responses (plan_music_conversion, musescore_api, etc.)."""
+
+from __future__ import annotations
+
+KEY_OK = "ok"
+KEY_MESSAGE = "message"
+KEY_HINT = "hint"
+KEY_ROUTE = "route"
+KEY_STATUS_CODE = "status_code"
+KEY_URL = "url"
+KEY_TEXT = "text"
+KEY_JSON = "json"

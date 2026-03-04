@@ -1,6 +1,6 @@
 # Lilycode MCP Server: Vision and Specification
 
-This document expands the original vision for the lilycode MCP server—a **Model Context Protocol (MCP)** server designed to enable AI agents and humans to "vibe code" music through natural workflows. It describes the goals, feature scope, error-handling philosophy, and design principles in full.
+This document expands the original vision for the rhythm vibe MCP server—a **Model Context Protocol (MCP)** server designed to enable AI agents and humans to "vibe code" music through natural workflows. It describes the goals, feature scope, error-handling philosophy, and design principles in full.
 
 ---
 
@@ -17,8 +17,8 @@ The server acts as a **music toolchain adapter** for MCP-compatible clients (Cla
 
 ---
 
-## Core Idea: Lilycode + Universal Shorthand
-
+## Core Idea: Music Theory + Universal Shorthand
+   
 **Lilycode** refers to LilyPond—a powerful, text-based music notation system. The server uses LilyPond as the primary engraving/notation target when feasible, but does **not** require users or agents to speak LilyPond directly.
 
 Instead, the server:

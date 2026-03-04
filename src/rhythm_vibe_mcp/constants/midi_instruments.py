@@ -1,0 +1,383 @@
+"""Mapping of instrument names to LilyPond midiInstrument values (General MIDI)."""
+
+from __future__ import annotations
+
+# Import clef map structure to stay in sync; we generate matching keys
+from rhythm_vibe_mcp.constants.clefs import INSTRUMENT_CLEF
+
+# Base: instrument name (normalized) -> LilyPond midiInstrument string
+_BASE_MIDI: dict[str, str] = {
+    "violin": "violin",
+    "violins": "violin",
+    "violin i": "violin",
+    "violin ii": "violin",
+    "violin 1": "violin",
+    "violin 2": "violin",
+    "first violin": "violin",
+    "second violin": "violin",
+    "piccolo violin": "violin",
+    "soprano violin": "violin",
+    "baroque violin": "violin",
+    "fiddle": "fiddle",
+    "hardanger fiddle": "fiddle",
+    "nyckelharpa": "violin",
+    "erhu": "violin",
+    "rebab": "violin",
+    "sarangi": "violin",
+    "kemenche": "violin",
+    "kokyu": "violin",
+    "viola": "viola",
+    "violas": "viola",
+    "viola d'amore": "viola",
+    "viola da gamba": "viola",
+    "gamba": "viola",
+    "treble viol": "violin",
+    "tenor viol": "cello",
+    "cello": "cello",
+    "cellos": "cello",
+    "violoncello": "cello",
+    "baritone violin": "contrabass",
+    "double bass": "contrabass",
+    "contrabass": "contrabass",
+    "bass": "contrabass",
+    "string bass": "contrabass",
+    "upright bass": "contrabass",
+    "bass violin": "contrabass",
+    "bass viol": "contrabass",
+    "violone": "contrabass",
+    "octobass": "contrabass",
+    "guitar": "acoustic guitar (nylon)",
+    "acoustic guitar": "acoustic guitar (nylon)",
+    "classical guitar": "acoustic guitar (nylon)",
+    "nylon guitar": "acoustic guitar (nylon)",
+    "steel string guitar": "acoustic guitar (steel)",
+    "electric guitar": "electric guitar (clean)",
+    "twelve-string guitar": "acoustic guitar (steel)",
+    "bass guitar": "electric bass (finger)",
+    "electric bass": "electric bass (finger)",
+    "ukulele": "acoustic guitar (nylon)",
+    "soprano ukulele": "acoustic guitar (nylon)",
+    "concert ukulele": "acoustic guitar (nylon)",
+    "tenor ukulele": "acoustic guitar (nylon)",
+    "baritone ukulele": "acoustic bass",
+    "mandolin": "acoustic guitar (nylon)",
+    "mandola": "viola",
+    "mandocello": "cello",
+    "lute": "acoustic guitar (nylon)",
+    "theorbo": "contrabass",
+    "archlute": "acoustic guitar (nylon)",
+    "cittern": "acoustic guitar (steel)",
+    "balalaika": "acoustic guitar (steel)",
+    "domra": "acoustic guitar (steel)",
+    "bandurria": "acoustic guitar (nylon)",
+    "charango": "acoustic guitar (nylon)",
+    "bouzouki": "acoustic guitar (steel)",
+    "sitar": "sitar",
+    "tanpura": "acoustic guitar (nylon)",
+    "oud": "acoustic guitar (nylon)",
+    "kora": "orchestral harp",
+    "banjo": "banjo",
+    "dobro": "acoustic guitar (steel)",
+    "lap steel": "electric guitar (clean)",
+    "pedal steel": "electric guitar (clean)",
+    "vihuela": "acoustic guitar (nylon)",
+    "guitarron": "acoustic bass",
+    "cuatro": "acoustic guitar (nylon)",
+    "tres": "acoustic guitar (nylon)",
+    "requinto": "acoustic guitar (nylon)",
+    "ronroco": "acoustic guitar (nylon)",
+    "harp": "orchestral harp",
+    "celtic harp": "orchestral harp",
+    "pedal harp": "orchestral harp",
+    "lever harp": "orchestral harp",
+    "lyre": "orchestral harp",
+    "flute": "flute",
+    "flutes": "flute",
+    "piccolo": "piccolo",
+    "alto flute": "flute",
+    "bass flute": "flute",
+    "contrabass flute": "flute",
+    "recorder": "recorder",
+    "soprano recorder": "recorder",
+    "alto recorder": "recorder",
+    "tenor recorder": "recorder",
+    "bass recorder": "recorder",
+    "blockflöte": "recorder",
+    "flageolet": "whistle",
+    "tin whistle": "whistle",
+    "penny whistle": "whistle",
+    "irish flute": "flute",
+    "fife": "piccolo",
+    "dizi": "flute",
+    "daegeum": "flute",
+    "shakuhachi": "shakuhachi",
+    "quena": "flute",
+    "pan flute": "pan flute",
+    "panpipes": "pan flute",
+    "ocarina": "ocarina",
+    "oboe": "oboe",
+    "oboes": "oboe",
+    "oboe d'amore": "oboe",
+    "english horn": "english horn",
+    "cor anglais": "english horn",
+    "heckelphone": "oboe",
+    "oboe da caccia": "oboe",
+    "musette": "oboe",
+    "shenai": "shanai",
+    "zurna": "oboe",
+    "suona": "oboe",
+    "hichiriki": "oboe",
+    "clarinet": "clarinet",
+    "clarinets": "clarinet",
+    "bb clarinet": "clarinet",
+    "a clarinet": "clarinet",
+    "eb clarinet": "clarinet",
+    "soprano clarinet": "clarinet",
+    "bass clarinet": "clarinet",
+    "alto clarinet": "clarinet",
+    "contrabass clarinet": "clarinet",
+    "basset horn": "clarinet",
+    "basset clarinet": "clarinet",
+    "chalumeau": "clarinet",
+    "tarogato": "clarinet",
+    "heckelphone-clarinet": "clarinet",
+    "bassoon": "bassoon",
+    "bassoons": "bassoon",
+    "contrabassoon": "bassoon",
+    "contra bassoon": "bassoon",
+    "double bassoon": "bassoon",
+    "tenoroon": "bassoon",
+    "dulcian": "bassoon",
+    "rauschpfeife": "oboe",
+    "crumhorn": "recorder",
+    "soprano saxophone": "soprano sax",
+    "soprano sax": "soprano sax",
+    "alto saxophone": "alto sax",
+    "alto sax": "alto sax",
+    "tenor saxophone": "tenor sax",
+    "tenor sax": "tenor sax",
+    "baritone saxophone": "baritone sax",
+    "baritone sax": "baritone sax",
+    "bass saxophone": "baritone sax",
+    "saxophone": "alto sax",
+    "sax": "alto sax",
+    "bagpipes": "bagpipe",
+    "highland pipes": "bagpipe",
+    "uilleann pipes": "bagpipe",
+    "great highland bagpipe": "bagpipe",
+    "biniou": "bagpipe",
+    "accordion": "accordion",
+    "concertina": "concertina",
+    "melodeon": "accordion",
+    "bandoneon": "accordion",
+    "harmonica": "harmonica",
+    "harmonica (chromatic)": "harmonica",
+    "trumpet": "trumpet",
+    "trumpets": "trumpet",
+    "bb trumpet": "trumpet",
+    "c trumpet": "trumpet",
+    "piccolo trumpet": "trumpet",
+    "bass trumpet": "trumpet",
+    "cornet": "trumpet",
+    "cornets": "trumpet",
+    "flugelhorn": "trumpet",
+    "pocket trumpet": "trumpet",
+    "natural trumpet": "trumpet",
+    "baroque trumpet": "trumpet",
+    "serpent": "tuba",
+    "cornett": "trumpet",
+    "sackbut": "trombone",
+    "french horn": "french horn",
+    "horn": "french horn",
+    "horns": "french horn",
+    "waldhorn": "french horn",
+    "natural horn": "french horn",
+    "vienna horn": "french horn",
+    "wagner tuba": "french horn",
+    "trombone": "trombone",
+    "trombones": "trombone",
+    "tenor trombone": "trombone",
+    "bass trombone": "trombone",
+    "alto trombone": "trombone",
+    "soprano trombone": "trumpet",
+    "contrabass trombone": "trombone",
+    "tuba": "tuba",
+    "tubas": "tuba",
+    "bass tuba": "tuba",
+    "euphonium": "tuba",
+    "baritone": "tuba",
+    "baritone horn": "tuba",
+    "sousaphone": "tuba",
+    "helicon": "tuba",
+    "bombardon": "tuba",
+    "ophicleide": "tuba",
+    "sarrusophone": "bassoon",
+    "piano": "acoustic grand",
+    "fortepiano": "acoustic grand",
+    "harpsichord": "harpsichord",
+    "clavichord": "clav",
+    "virginal": "harpsichord",
+    "spinet": "harpsichord",
+    "organ": "church organ",
+    "pipe organ": "church organ",
+    "reed organ": "reed organ",
+    "harmonium": "reed organ",
+    "celesta": "celesta",
+    "clavinet": "clav",
+    "synthesizer": "synthstrings 1",
+    "keyboard": "acoustic grand",
+    "electric piano": "electric piano 1",
+    "xylophone": "xylophone",
+    "marimba": "marimba",
+    "vibraphone": "vibraphone",
+    "glockenspiel": "glockenspiel",
+    "orchestral bells": "glockenspiel",
+    "chimes": "tubular bells",
+    "tubular bells": "tubular bells",
+    "timpani": "timpani",
+    "kettledrums": "timpani",
+    "steelpan": "steel drums",
+    "steel drum": "steel drums",
+    "hang drum": "steel drums",
+    "handpan": "steel drums",
+    "dulcimer": "dulcimer",
+    "hammered dulcimer": "dulcimer",
+    "appalachian dulcimer": "dulcimer",
+    "cymbalom": "dulcimer",
+    "cimbalom": "dulcimer",
+    "santur": "dulcimer",
+    "yangqin": "dulcimer",
+    "kalimba": "kalimba",
+    "thumb piano": "kalimba",
+    "mbira": "kalimba",
+    "tambura": "acoustic guitar (nylon)",
+    "soprano": "choir aahs",
+    "mezzo-soprano": "choir aahs",
+    "mezzo soprano": "choir aahs",
+    "alto": "choir aahs",
+    "contralto": "choir aahs",
+    "tenor": "choir aahs",
+    "bass voice": "choir aahs",
+    "countertenor": "choir aahs",
+    "voice": "choir aahs",
+    "singer": "choir aahs",
+    "choir": "choir aahs",
+    "chorus": "choir aahs",
+    "solo": "acoustic grand",
+    "melody": "acoustic grand",
+}
+
+# Build INSTRUMENT_MIDI: sync with INSTRUMENT_CLEF keys so every clef-mapped instrument has a MIDI mapping
+INSTRUMENT_MIDI: dict[str, str] = {}
+
+
+def _extend_midi_map() -> None:
+    # For every key in INSTRUMENT_CLEF, assign MIDI; use _BASE_MIDI when available
+    """Executes logic for _extend_midi_map.
+
+    Args:
+    ----
+        None
+
+    Returns:
+    -------
+        Any: Description of return value.
+
+    Processing Logic:
+    -------------------
+        - High level explanation of _extend_midi_map logic.
+
+    """
+    for inst_key, clef in INSTRUMENT_CLEF.items():
+        if inst_key in _BASE_MIDI:
+            INSTRUMENT_MIDI[inst_key] = _BASE_MIDI[inst_key]
+        else:
+            # Infer from base instrument (e.g. "violin 47" -> violin)
+            base = inst_key
+            for candidate in (
+                "violin",
+                "viola",
+                "cello",
+                "flute",
+                "oboe",
+                "clarinet",
+                "bassoon",
+                "trumpet",
+                "horn",
+                "trombone",
+                "tuba",
+                "saxophone",
+                "sax",
+                "recorder",
+                "guitar",
+                "piano",
+                "harp",
+                "xylophone",
+                "marimba",
+                "vibraphone",
+                "timpani",
+            ):
+                if inst_key.startswith(candidate) or inst_key.replace(
+                    " ",
+                    "",
+                ).startswith(candidate):
+                    base = candidate
+                    break
+            INSTRUMENT_MIDI[inst_key] = _BASE_MIDI.get(base, "acoustic grand")
+
+
+_extend_midi_map()
+
+
+_SUBSTRING_FALLBACKS: list[tuple[str, str]] = [
+    ("cello", "cello"),
+    ("violin", "violin"),
+    ("viola", "viola"),
+    ("contrabass", "contrabass"),
+    ("bass", "contrabass"),
+    ("double bass", "contrabass"),
+    ("flute", "flute"),
+    ("piccolo", "piccolo"),
+    ("oboe", "oboe"),
+    ("clarinet", "clarinet"),
+    ("trumpet", "trumpet"),
+    ("trombone", "trombone"),
+    ("tuba", "tuba"),
+    ("french horn", "french horn"),
+    ("horn", "french horn"),
+    ("bassoon", "bassoon"),
+    ("sax", "alto sax"),
+    ("guitar", "acoustic guitar (nylon)"),
+    ("harp", "orchestral harp"),
+    ("piano", "acoustic grand"),
+    ("marimba", "marimba"),
+    ("xylophone", "xylophone"),
+    ("vibraphone", "vibraphone"),
+    ("recorder", "recorder"),
+]
+
+
+def midi_for_instrument(instrument: str) -> str:
+    """Return LilyPond midiInstrument string for the given instrument name.
+
+    Args:
+    ----
+        instrument (Any): Description for instrument.
+
+    Returns:
+    -------
+        Any: Description of return value.
+
+    Processing Logic:
+    -------------------
+        - High level explanation of midi_for_instrument logic.
+
+    """
+    k = instrument.lower().strip()
+    k_nospace = k.replace(" ", "")
+    if k in INSTRUMENT_MIDI:
+        return INSTRUMENT_MIDI[k]
+    for substr, midi in _SUBSTRING_FALLBACKS:
+        if substr in k_nospace or substr in k:
+            return midi
+    return "acoustic grand"

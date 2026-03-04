@@ -1,0 +1,1 @@
+GNU LilyPond 2.24.4 (running Guile 2.2)

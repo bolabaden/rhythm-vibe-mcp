@@ -1,0 +1,136 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build static site bundle
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          from datetime import datetime, timezone
+
+          root = Path('.')
+          site = root / '_site'
+          if site.exists():
+              shutil.rmtree(site)
+          (site / 'docs').mkdir(parents=True, exist_ok=True)
+          (site / 'artifacts').mkdir(parents=True, exist_ok=True)
+
+          def copy_if_exists(src: Path, dst: Path) -> None:
+              if src.exists() and src.is_file():
+                  dst.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(src, dst)
+
+          copy_if_exists(root / 'README.md', site / 'README.md')
+
+          for md in sorted((root / 'docs').glob('*.md')):
+              copy_if_exists(md, site / 'docs' / md.name)
+
+          allowed_artifact_ext = {
+              '.md', '.pdf', '.ly', '.lilypond', '.musicxml', '.mid', '.midi', '.json'
+          }
+          artifacts_dir = root / 'artifacts'
+          for item in sorted(artifacts_dir.glob('*')):
+              if item.is_file() and item.suffix.lower() in allowed_artifact_ext:
+                  copy_if_exists(item, site / 'artifacts' / item.name)
+
+          def list_links(folder: Path, base_href: str) -> str:
+              files = sorted(p.name for p in folder.glob('*') if p.is_file())
+              if not files:
+                  return '<li><em>None</em></li>'
+              return '\n'.join(f'<li><a href="{base_href}/{name}">{name}</a></li>' for name in files)
+
+          docs_links = list_links(site / 'docs', 'docs')
+          artifacts_links = list_links(site / 'artifacts', 'artifacts')
+          generated = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')
+
+          html = f'''<!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>rhythm-vibe-mcp</title>
+            <style>
+              body {{ font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 2rem; line-height: 1.5; }}
+              h1, h2 {{ margin-bottom: 0.4rem; }}
+              section {{ margin-top: 1.5rem; }}
+              ul {{ margin-top: 0.5rem; }}
+              code {{ background: #f4f4f4; padding: 0.12rem 0.3rem; border-radius: 4px; }}
+              .meta {{ color: #666; font-size: 0.95rem; }}
+            </style>
+          </head>
+          <body>
+            <h1>rhythm-vibe-mcp</h1>
+            <p class="meta">Auto-published with GitHub Pages from <code>master</code>. Generated: {generated}</p>
+
+            <section>
+              <h2>Project Root</h2>
+              <ul>
+                <li><a href="README.md">README.md</a></li>
+              </ul>
+            </section>
+
+            <section>
+              <h2>Docs</h2>
+              <ul>
+                {docs_links}
+              </ul>
+            </section>
+
+            <section>
+              <h2>Artifacts</h2>
+              <ul>
+                {artifacts_links}
+              </ul>
+            </section>
+          </body>
+          </html>
+          '''
+
+          (site / 'index.html').write_text(html, encoding='utf-8')
+          (site / '.nojekyll').write_text('', encoding='utf-8')
+          print('Built _site with index.html, docs, and artifacts.')
+          PY
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

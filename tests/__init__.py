@@ -1,1 +1,1 @@
-# Tests for lilycode-mcp
+# Tests for rhythm-vibe-mcp

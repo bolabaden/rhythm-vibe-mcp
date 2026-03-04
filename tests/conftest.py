@@ -1,5 +1,5 @@
 """
-Pytest configuration and shared fixtures for lilycode-mcp.
+Pytest configuration and shared fixtures for rhythm-vibe-mcp.
 
 Best practices applied:
 - asyncio_mode = "auto" (pyproject.toml) so async tests run without per-test decorators.
@@ -8,7 +8,6 @@ Best practices applied:
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
@@ -22,8 +21,8 @@ def tmp_workdir(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def monkeypatch_workdir(monkeypatch: pytest.MonkeyPatch, tmp_workdir: Path) -> Path:
-    """Set LILYCODE_MCP_WORKDIR so artifacts_dir() uses tmp_path."""
-    monkeypatch.setenv("LILYCODE_MCP_WORKDIR", str(tmp_workdir))
+    """Set rhythm_vibe_mcp_WORKDIR so artifacts_dir() uses tmp_path."""
+    monkeypatch.setenv("rhythm_vibe_mcp_WORKDIR", str(tmp_workdir))
     return tmp_workdir
 
 

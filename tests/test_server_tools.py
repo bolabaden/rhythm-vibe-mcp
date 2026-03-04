@@ -15,9 +15,10 @@ from unittest.mock import patch
 
 import pytest
 
-from lilycode_mcp.server import (
+from rhythm_vibe_mcp.server import (
     _SESSION_STATE,
     audio_or_file_to_sheet,
+    batch_convert_audio,
     compose_story_lily,
     convert_music,
     convert_text_notation_to_lily_or_fallback,
@@ -85,6 +86,13 @@ class TestPlanMusicConversion:
         assert data["ok"] is False
         assert "hint" in data
         assert "abc" in data["hint"].lower() or "format" in data["hint"].lower()
+
+    def test_alias_format_route(self) -> None:
+        out = plan_music_conversion("aiff", "lilypond")
+        data = _parse_tool_output(out)
+        assert data["ok"] is True
+        assert data["route"][0] == "wav"
+        assert data["route"][-1] == "lilypond"
 
 
 class TestNormalizeRedditMusicText:
@@ -187,7 +195,7 @@ class TestMusescoreApi:
         assert data.get("ok") is False or "Invalid" in data.get("message", "")
 
     def test_success_mocked(self) -> None:
-        with patch("lilycode_mcp.server.musescore_api_request") as mock_req:
+        with patch("rhythm_vibe_mcp.server.musescore_api_request") as mock_req:
             mock_req.return_value = {
                 "ok": True,
                 "json": {"scores": []},
@@ -203,7 +211,7 @@ class TestFetchMusicFromWeb:
     """fetch_music_from_web(url) downloads and returns artifact JSON."""
 
     def test_success_returns_artifact_json(self, monkeypatch_workdir: Path) -> None:
-        with patch("lilycode_mcp.server.download_music_asset") as mock_dl:
+        with patch("rhythm_vibe_mcp.server.download_music_asset") as mock_dl:
             mock_dl.return_value = monkeypatch_workdir / "downloaded.mid"
             (monkeypatch_workdir / "downloaded.mid").write_bytes(b"\x00\x01")
             out = fetch_music_from_web("https://example.com/song.mid")
@@ -215,7 +223,7 @@ class TestFetchMusicFromWeb:
             mock_dl.assert_called_once_with("https://example.com/song.mid")
 
     def test_fetch_failure_returns_structured_error(self) -> None:
-        with patch("lilycode_mcp.server.download_music_asset") as mock_dl:
+        with patch("rhythm_vibe_mcp.server.download_music_asset") as mock_dl:
             mock_dl.side_effect = Exception("403 Forbidden")
             out = fetch_music_from_web("https://example.com/forbidden.mid")
             data = _parse_tool_output(out)
@@ -282,3 +290,16 @@ class TestAudioOrFileToSheet:
         data = _parse_tool_output(out)
         assert data["ok"] is True
         assert data.get("artifacts")
+
+
+class TestBatchConvertAudio:
+    """batch_convert_audio(input_ref) returns JSON and handles missing files."""
+
+    def test_missing_file_returns_error(self) -> None:
+        out = batch_convert_audio("/nonexistent/path/audio.m4a")
+        data = _parse_tool_output(out)
+        assert data["ok"] is False
+        assert "input" in data.get("message", "").lower() or "exist" in data.get(
+            "message",
+            "",
+        ).lower()

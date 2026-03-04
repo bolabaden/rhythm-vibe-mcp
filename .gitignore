@@ -218,3 +218,4 @@ mcp_agent.secrets.yaml
 .history/
 .ruff_cache/
 .mypy_cache/
+cello_samples/

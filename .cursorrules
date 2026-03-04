@@ -2,7 +2,7 @@
 
 Exclusively use `uv` when running python commands. Do not use python/python3 itself.
 
-**CLI:** `lilycode-mcp-cli` is generated from the server’s registered tools only. Run `uv run lilycode-mcp-cli --help` for subcommands; use `uv run lilycode-mcp-cli TOOL --help` for a tool’s options. Do not hardcode tool names in the CLI—it introspects `mcp._tool_manager.list_tools()`.
+**CLI:** `rhythm-vibe-mcp-cli` is generated from the server’s registered tools only. Run `uv run rhythm-vibe-mcp-cli --help` for subcommands; use `uv run rhythm-vibe-mcp-cli TOOL --help` for a tool’s options. Do not hardcode tool names in the CLI—it introspects `mcp._tool_manager.list_tools()`.
 
 (.venv) PS C:\GitHub\rhythm-vibe-mcp> uv --help                                                   
 An extremely fast Python package manager.                                                         

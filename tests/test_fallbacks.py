@@ -4,7 +4,7 @@ Unit tests for fallback representation: ABC/ChordPro detection and error fallbac
 
 from __future__ import annotations
 
-from lilycode_mcp.fallbacks import fallback_from_error, fallback_from_text
+from rhythm_vibe_mcp.fallbacks import fallback_from_error, fallback_from_text
 
 
 class TestFallbackFromText:
