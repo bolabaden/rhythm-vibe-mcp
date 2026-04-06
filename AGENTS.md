@@ -23,3 +23,4 @@ rhythm-vibe-mcp is a single Python package (not a monorepo) providing an MCP ser
 - The `audio` extra (`basic-pitch`) requires Python ≤3.11 due to tensorflow 2.15.0 wheel availability. On Python 3.12+, install without `--extra audio`: `uv sync --extra dev --extra scrape`.
 - System binaries `lilypond` and `ffmpeg` are optional. Without them, the server returns structured fallback outputs instead of rendered files. Install via `sudo apt-get install -y lilypond` if needed (ffmpeg is typically pre-installed).
 - The Web UI's "AI Music Assistant" chat requires an external LLM backend and may not respond without one configured. The Score Editor (LilyPond Studio) and all MCP tools work independently.
+- The Gradio Web UI accordion sections may be sluggish in headless browser environments. For reliable tool invocation and testing, prefer the CLI client (`rhythm-vibe-mcp-cli`) which exercises the same MCP server tools over stdio.
