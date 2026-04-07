@@ -79,5 +79,3 @@ Registered script aliases (all equivalent entrypoints defined in `pyproject.toml
 - The `audio` extra (`basic-pitch`) requires Python ≤3.11 due to tensorflow 2.15.0 wheel availability. On Python 3.12+, install without `--extra audio`: `uv sync --extra dev --extra scrape`.
 - System binaries `lilypond` and `ffmpeg` are pre-installed in the Cloud Agent environment (`/usr/bin/lilypond`, `/usr/bin/ffmpeg`). Without them, the server returns structured fallback outputs instead of rendered files.
 - The Web UI's "AI Music Assistant" chat requires an external LLM backend and may not respond without one configured. The Score Editor (LilyPond Studio) and all MCP tools work independently.
-- All tool payloads return JSON strings; keys/values are stable public contracts — do not change them without updating `tests/test_server_tools.py` and `tests/test_mcp_integration.py`.
-- The CLI introspects `mcp._tool_manager.list_tools()` at runtime — do not hardcode tool names in it.
