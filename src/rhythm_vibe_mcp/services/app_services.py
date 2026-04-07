@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 class MusicToolApplicationService:
     """Application-layer façade over server tool workflows.
 
-    This layer is intentionally thin during scaffold phase and delegates to the
-    existing runtime service implementation to preserve behavior.
+    Delegates each public MCP tool to the underlying MusicToolService,
+    providing a stable interface for both MCP endpoints and the Gradio Web UI.
     """
 
     def __init__(self, tool_service: MusicToolService) -> None:
@@ -92,12 +92,12 @@ class MusicToolApplicationService:
     def batch_convert_audio_formats(self, input_ref: str) -> str:
         return self._tool_service.batch_convert_audio_formats(input_ref)
 
-class ConversionPipelineService:
-    """Scaffold for conversion orchestration extraction.
+    def analyze_audio_performance(self, input_ref: str) -> str:
+        return self._tool_service.analyze_audio_performance(input_ref)
 
-    This remains intentionally narrow in prompt 4; behavior will be migrated in
-    later prompts.
-    """
+
+class ConversionPipelineService:
+    """Orchestration service for format-conversion and transposition workflows."""
 
     def __init__(self, app_service: MusicToolApplicationService) -> None:
         self._app_service: MusicToolApplicationService = app_service
@@ -107,6 +107,15 @@ class ConversionPipelineService:
 
     def transpose_song(self, input_ref: str, semitones: int, output_format: str) -> str:
         return self._app_service.transpose_song(input_ref, semitones, output_format)
+
+    def plan_music_conversion(self, input_format: str, output_format: str) -> str:
+        return self._app_service.plan_music_conversion(input_format, output_format)
+
+    def audio_or_file_to_sheet(self, input_ref: str, prefer_output: str) -> str:
+        return self._app_service.audio_or_file_to_sheet(input_ref, prefer_output)
+
+    def batch_convert_audio_formats(self, input_ref: str) -> str:
+        return self._app_service.batch_convert_audio_formats(input_ref)
 
 
 class FallbackService:
