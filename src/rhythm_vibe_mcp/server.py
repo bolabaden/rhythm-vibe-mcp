@@ -676,7 +676,7 @@ def batch_convert_audio(input_ref: str) -> str:
 
     Returns per-format conversion results and output artifact paths.
     """
-    return _SERVICE.batch_convert_audio_formats(input_ref)
+    return _APP_SERVICE.batch_convert_audio_formats(input_ref)
 
 
 @mcp.tool()
@@ -685,7 +685,7 @@ def analyze_audio_performance(input_ref: str) -> str:
 
     Produces a text summary with articulation/intonation proxies and MIDI/LilyPond artifacts.
     """
-    return _SERVICE.analyze_audio_performance(input_ref)
+    return _APP_SERVICE.analyze_audio_performance(input_ref)
 
 def main(argv: list[str] | None = None) -> None:
     """Run MCP server with transport arguments.

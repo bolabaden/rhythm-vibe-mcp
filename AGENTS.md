@@ -79,3 +79,7 @@ Registered script aliases (all equivalent entrypoints defined in `pyproject.toml
 - The `audio` extra (`basic-pitch`) requires Python ≤3.11 due to tensorflow 2.15.0 wheel availability. On Python 3.12+, install without `--extra audio`: `uv sync --extra dev --extra scrape`.
 - System binaries `lilypond` and `ffmpeg` are pre-installed in the Cloud Agent environment (`/usr/bin/lilypond`, `/usr/bin/ffmpeg`). Without them, the server returns structured fallback outputs instead of rendered files.
 - The Web UI's "AI Music Assistant" chat requires an external LLM backend and may not respond without one configured. The Score Editor (LilyPond Studio) and all MCP tools work independently.
+- The Gradio Web UI accordion sections may be sluggish in headless browser environments. For reliable tool invocation and testing, prefer the CLI client (`rhythm-vibe-mcp-cli`) which exercises the same MCP server tools over stdio.
+- `MUSESCORE_API_TOKEN` is sensitive — set it via environment variables or a `.env` file (which is git-ignored). Never hardcode tokens in source files.
+- All subprocess calls (`lilypond`, `ffmpeg`, `git`) use list-form arguments, not `shell=True`, so shell-injection through user-supplied paths is not possible.
+- `spaces_sync.py` uses `urllib.request.urlopen` (stdlib, no SSL verify override) for the Hugging Face API and clones repos via `git clone`. It is a standalone utility script not wired into the MCP server.
